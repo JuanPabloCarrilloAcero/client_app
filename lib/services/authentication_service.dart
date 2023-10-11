@@ -4,6 +4,7 @@ import 'package:graphql_flutter/graphql_flutter.dart';
 import 'graphql_service.dart';
 
 class AuthenticationService {
+
   final graphQLService = GraphQLService();
 
   Future<String> login(String username, String password) async {
@@ -46,6 +47,7 @@ class AuthenticationService {
     }
   }
 
+  //TODO: Connect with graphql
   Future<bool> verify() async {
     await Future.delayed(const Duration(seconds: 0)); // Adding a 5-second delay
 

@@ -1,78 +1,84 @@
 import 'package:client_app/screens/login_screen.dart';
+import 'package:client_app/services/authentication_service.dart';
 import 'package:client_app/widgets/about_us.dart';
 import 'package:client_app/widgets/deposit_retire.dart';
+import 'package:client_app/widgets/home/home.dart';
 import 'package:client_app/widgets/watchlist.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../services/graphql_service.dart';
-import '../widgets/dashboard.dart';
 
 class HomeScreen extends StatelessWidget {
-
   final Widget body;
   final String title;
+  final AuthenticationService authService;
   final GraphQLService graphQLService;
 
-  const HomeScreen({super.key, required this.body, required this.title, required this.graphQLService});
+  const HomeScreen(
+      {super.key,
+      required this.body,
+      required this.title,
+      required this.authService,
+      required this.graphQLService});
 
   void _navigateToScreens(BuildContext context, String option) {
-
     Widget screen;
     if (option == 'Watchlist') {
       screen = HomeScreen(
         body: const WatchlistWidget(),
         title: 'Watchlist',
         graphQLService: graphQLService,
+        authService: authService,
       );
     } else if (option == 'Deposit / Retire') {
       screen = HomeScreen(
         body: const DepositRetireWidget(),
         title: 'Deposit / Retire',
         graphQLService: graphQLService,
+        authService: authService,
       );
     } else if (option == 'Portfolio') {
       screen = HomeScreen(
-        body: const DashboardWidget(),
+        body: const AboutUsWidget(),
         title: 'Portfolio',
         graphQLService: graphQLService,
+        authService: authService,
       );
     } else if (option == 'Discover') {
       screen = HomeScreen(
-        body: const DashboardWidget(),
+        body: const AboutUsWidget(),
         title: 'Discover',
         graphQLService: graphQLService,
+        authService: authService,
       );
     } else if (option == 'AboutUs') {
       screen = HomeScreen(
         body: const AboutUsWidget(),
         title: 'About Us',
         graphQLService: graphQLService,
+        authService: authService,
       );
     } else if (option == 'Profile') {
       screen = HomeScreen(
-        body: const DashboardWidget(),
+        body: const AboutUsWidget(),
         title: 'Profile',
         graphQLService: graphQLService,
+        authService: authService,
       );
     } else {
-      screen = HomeScreen(
-        body: const DashboardWidget(),
-        title: 'Home',
-        graphQLService: graphQLService,
-      );
+      screen =
+          HomeWidget(graphQLService: graphQLService, authService: authService);
     }
 
     if (option == 'Logout') {
-
       const storage = FlutterSecureStorage();
 
-      storage
-          .delete(key: "JWT")
-          .then((value) {
+      storage.delete(key: "JWT").then((value) {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
-            builder: (context) => const LoginScreen(),
+            builder: (context) => LoginScreen(
+                authService: authService, graphQLService: graphQLService),
           ),
         );
       });
@@ -86,7 +92,6 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         title: GestureDetector(

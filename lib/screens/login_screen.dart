@@ -1,13 +1,16 @@
 import 'package:client_app/services/graphql_service.dart';
+import 'package:client_app/widgets/home/home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../services/authentication_service.dart';
-import '../widgets/dashboard.dart';
-import 'home_screen.dart';
 
 class LoginScreen extends StatelessWidget {
-  const LoginScreen({super.key});
+  final AuthenticationService authService;
+  final GraphQLService graphQLService;
+
+  const LoginScreen(
+      {super.key, required this.authService, required this.graphQLService});
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +29,7 @@ class LoginScreen extends StatelessWidget {
         backgroundColor: const Color(0xFFF9FBFA),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(350.0),
+        padding: const EdgeInsets.all(16.0),
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -55,28 +58,24 @@ class LoginScreen extends StatelessWidget {
                   final username = usernameController.text;
                   final password = passwordController.text;
 
-                  AuthenticationService()
-                      .login(username, password)
-                      .then((token) {
+                  authService.login(username, password).then((token) {
                     // Authentication successful
                     const storage = FlutterSecureStorage();
                     storage.write(key: "JWT", value: token).then((value) {
                       Navigator.of(context).pushReplacement(
                         MaterialPageRoute(
-                          builder: (context) => HomeScreen(
-                            body: const DashboardWidget(),
-                            title: 'Home',
-                            graphQLService: GraphQLService(),
-                          ),
+                          builder: (context) => HomeWidget(
+                              graphQLService: graphQLService,
+                              authService: authService),
                         ),
                       );
                     });
-                  })
-                      .catchError((error) {
+                  }).catchError((error) {
                     // Authentication failed
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text('Authentication failed. Please try again. $error'),
+                        content: Text(
+                            'Authentication failed. Please try again. $error'),
                       ),
                     );
                   });
