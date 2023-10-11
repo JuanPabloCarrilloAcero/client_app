@@ -1,3 +1,4 @@
+import 'package:client_app/services/graphql_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -56,29 +57,28 @@ class LoginScreen extends StatelessWidget {
 
                   AuthenticationService()
                       .login(username, password)
-                      .then((isAuthenticated) {
-                    if (isAuthenticated) {
-                      const storage = FlutterSecureStorage();
-                      storage
-                          .write(key: "JWT", value: "YOUR_JWT_TOKEN_HERE")
-                          .then((value) {
-                        Navigator.of(context).pushReplacement(
-                          MaterialPageRoute(
-                            builder: (context) => const HomeScreen(
-                                body: DashboardWidget(),
-                                title: 'Home'
-                            ),
+                      .then((token) {
+                    // Authentication successful
+                    const storage = FlutterSecureStorage();
+                    storage.write(key: "JWT", value: token).then((value) {
+                      Navigator.of(context).pushReplacement(
+                        MaterialPageRoute(
+                          builder: (context) => HomeScreen(
+                            body: const DashboardWidget(),
+                            title: 'Home',
+                            graphQLService: GraphQLService(),
                           ),
-                        );
-                      });
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content:
-                          Text('Authentication failed. Please try again.'),
                         ),
                       );
-                    }
+                    });
+                  })
+                      .catchError((error) {
+                    // Authentication failed
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Authentication failed. Please try again.'),
+                      ),
+                    );
                   });
                 },
                 style: ElevatedButton.styleFrom(

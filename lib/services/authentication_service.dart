@@ -1,11 +1,34 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
+import 'graphql_service.dart';
+
 class AuthenticationService {
-  Future<bool> login(String username, String password) async {
-    if (username == 'user' && password == 'password') {
-      return true;
+
+  final graphQLService = GraphQLService();
+
+  Future<String> login(String username, String password) async {
+
+    const String loginMutation = r'''
+      mutation {
+        loginUsuario(usuario: { nameUser: $nameUser, passwordUser: $passwordUser })
+      }
+    ''';
+
+    final Map<String, dynamic> variables = {
+      'nameUser': username,
+      'passwordUser': password,
+    };
+
+    final mutatedLoginMutation = loginMutation.replaceAll('\$nameUser', '"${variables['nameUser']}"').replaceAll('\$passwordUser', '"${variables['passwordUser']}"');
+
+    final mutationResult = await graphQLService.performMutation(mutatedLoginMutation);
+
+    if (mutationResult.hasException) {
+      throw mutationResult.exception!;
+    } else {
+      final token = mutationResult.data?['loginUsuario'];
+      return token;
     }
-    return false;
   }
 
   Future<bool> verify() async {

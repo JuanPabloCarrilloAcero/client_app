@@ -5,52 +5,61 @@ import 'package:client_app/widgets/watchlist.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
+import '../services/graphql_service.dart';
 import '../widgets/dashboard.dart';
 
 class HomeScreen extends StatelessWidget {
 
   final Widget body;
   final String title;
+  final GraphQLService graphQLService;
 
-  const HomeScreen({super.key, required this.body, required this.title});
+  const HomeScreen({super.key, required this.body, required this.title, required this.graphQLService});
 
   void _navigateToScreens(BuildContext context, String option) {
 
     Widget screen;
     if (option == 'Watchlist') {
-      screen = const HomeScreen(
-        body: WatchlistWidget(),
+      screen = HomeScreen(
+        body: const WatchlistWidget(),
         title: 'Watchlist',
+        graphQLService: graphQLService,
       );
     } else if (option == 'Deposit / Retire') {
-      screen = const HomeScreen(
-        body: DepositRetireWidget(),
+      screen = HomeScreen(
+        body: const DepositRetireWidget(),
         title: 'Deposit / Retire',
+        graphQLService: graphQLService,
       );
     } else if (option == 'Portfolio') {
-      screen = const HomeScreen(
-        body: DashboardWidget(),
+      screen = HomeScreen(
+        body: const DashboardWidget(),
         title: 'Portfolio',
+        graphQLService: graphQLService,
       );
     } else if (option == 'Discover') {
-      screen = const HomeScreen(
-        body: DashboardWidget(),
+      screen = HomeScreen(
+        body: const DashboardWidget(),
         title: 'Discover',
+        graphQLService: graphQLService,
       );
     } else if (option == 'AboutUs') {
-      screen = const HomeScreen(
-        body: AboutUsWidget(),
+      screen = HomeScreen(
+        body: const AboutUsWidget(),
         title: 'About Us',
+        graphQLService: graphQLService,
       );
     } else if (option == 'Profile') {
-      screen = const HomeScreen(
-        body: DashboardWidget(),
+      screen = HomeScreen(
+        body: const DashboardWidget(),
         title: 'Profile',
+        graphQLService: graphQLService,
       );
     } else {
-      screen = const HomeScreen(
-        body: DashboardWidget(),
+      screen = HomeScreen(
+        body: const DashboardWidget(),
         title: 'Home',
+        graphQLService: graphQLService,
       );
     }
 

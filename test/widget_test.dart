@@ -6,6 +6,7 @@
 // tree, read text, and verify that the values of widget properties are correct.
 
 import 'package:client_app/services/authentication_service.dart';
+import 'package:client_app/services/graphql_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -15,8 +16,9 @@ void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
 
     AuthenticationService authService = AuthenticationService();
+    GraphQLService graphQLService = GraphQLService();
     // Build our app and trigger a frame.
-    await tester.pumpWidget(MyApp(authService: authService));
+    await tester.pumpWidget(MyApp(authService: authService, graphQLService: graphQLService));
 
     // Verify that our counter starts at 0.
     expect(find.text('0'), findsOneWidget);
