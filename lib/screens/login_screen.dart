@@ -75,8 +75,8 @@ class LoginScreen extends StatelessWidget {
                       .catchError((error) {
                     // Authentication failed
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Authentication failed. Please try again.'),
+                      SnackBar(
+                        content: Text('Authentication failed. Please try again. $error'),
                       ),
                     );
                   });
