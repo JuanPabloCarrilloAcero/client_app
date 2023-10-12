@@ -6,11 +6,7 @@ import '../services/graphql_service.dart';
 import 'login_screen.dart';
 
 class UNvestApp extends StatefulWidget {
-  const UNvestApp(
-      {super.key, required this.authService, required this.graphQLService});
-
-  final AuthenticationService authService;
-  final GraphQLService graphQLService;
+  const UNvestApp({super.key});
 
   @override
   UNvestAppState createState() => UNvestAppState();
@@ -21,18 +17,14 @@ class UNvestAppState extends State<UNvestApp> {
   void initState() {
     super.initState();
 
-    widget.authService.verify().then((loggedIn) {
+    AuthenticationService().verify().then((loggedIn) {
       if (loggedIn) {
         Navigator.of(context).pushReplacement(MaterialPageRoute(
-          builder: (context) => HomeWidget(
-              graphQLService: widget.graphQLService,
-              authService: widget.authService),
+          builder: (context) => const HomeWidget(),
         ));
       } else {
         Navigator.of(context).pushReplacement(MaterialPageRoute(
-          builder: (context) => LoginScreen(
-              authService: widget.authService,
-              graphQLService: widget.graphQLService),
+          builder: (context) => const LoginScreen(),
         ));
       }
     });

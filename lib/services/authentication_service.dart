@@ -5,8 +5,6 @@ import 'graphql_service.dart';
 
 class AuthenticationService {
 
-  final graphQLService = GraphQLService();
-
   Future<String> login(String username, String password) async {
     const String loginMutation = r'''
       mutation {
@@ -24,7 +22,7 @@ class AuthenticationService {
         .replaceAll('\$passwordUser', '"${variables['passwordUser']}"');
 
     final mutationResult =
-        await graphQLService.performMutation(mutatedLoginMutation);
+        await GraphQLService().performMutation(mutatedLoginMutation);
 
     if (mutationResult.hasException) {
       if (mutationResult.exception is OperationException &&

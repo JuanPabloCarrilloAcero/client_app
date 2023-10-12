@@ -1,4 +1,3 @@
-import 'package:client_app/services/graphql_service.dart';
 import 'package:client_app/widgets/home/home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -6,11 +5,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../services/authentication_service.dart';
 
 class LoginScreen extends StatelessWidget {
-  final AuthenticationService authService;
-  final GraphQLService graphQLService;
-
-  const LoginScreen(
-      {super.key, required this.authService, required this.graphQLService});
+  const LoginScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -21,9 +16,13 @@ class LoginScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Login'),
         flexibleSpace: Center(
-          child: Image.asset(
-            'assets/logo.png',
-            height: 100,
+          child: Padding(
+            padding: const EdgeInsets.only(top: 50.0),
+            // Adjust the padding value as needed
+            child: Image.asset(
+              'assets/logo.png',
+              height: 80,
+            ),
           ),
         ),
         backgroundColor: const Color(0xFFF9FBFA),
@@ -58,15 +57,16 @@ class LoginScreen extends StatelessWidget {
                   final username = usernameController.text;
                   final password = passwordController.text;
 
-                  authService.login(username, password).then((token) {
+                  AuthenticationService()
+                      .login(username, password)
+                      .then((token) {
                     // Authentication successful
                     const storage = FlutterSecureStorage();
+                    print('Token: $token');
                     storage.write(key: "JWT", value: token).then((value) {
                       Navigator.of(context).pushReplacement(
                         MaterialPageRoute(
-                          builder: (context) => HomeWidget(
-                              graphQLService: graphQLService,
-                              authService: authService),
+                          builder: (context) => const HomeWidget(),
                         ),
                       );
                     });

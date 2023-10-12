@@ -9,19 +9,13 @@ void main() async {
 
   await dotenv.load(fileName: ".env");
 
-  AuthenticationService authService = AuthenticationService();
-
-  GraphQLService graphQLService = GraphQLService();
-
-  runApp(MyApp(authService: authService, graphQLService: graphQLService));
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  final AuthenticationService authService;
-  final GraphQLService graphQLService;
 
   const MyApp(
-      {Key? key, required this.authService, required this.graphQLService})
+      {Key? key})
       : super(key: key);
 
   @override
@@ -30,7 +24,7 @@ class MyApp extends StatelessWidget {
 
     return MaterialApp(
       title: title,
-      home: UNvestApp(authService: authService, graphQLService: graphQLService),
+      home: const UNvestApp(),
       theme: unvestTheme,
     );
   }

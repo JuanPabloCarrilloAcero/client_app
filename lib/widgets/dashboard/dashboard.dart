@@ -15,7 +15,7 @@ class DashboardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GridView.count(
-      crossAxisCount: 4,
+      crossAxisCount: 1,
       mainAxisSpacing: 8.0,
       crossAxisSpacing: 8.0,
       children: <Widget>[

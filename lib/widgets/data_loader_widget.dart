@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
+import '../main.dart';
 
 class DataLoaderWidget<T> extends StatelessWidget {
   final Future<T> Function() fetchData;
   final Widget Function(T data) builder;
 
-  const DataLoaderWidget({super.key, required this.fetchData, required this.builder});
+  const DataLoaderWidget(
+      {super.key, required this.fetchData, required this.builder});
 
   @override
   Widget build(BuildContext context) {
@@ -18,6 +22,12 @@ class DataLoaderWidget<T> extends StatelessWidget {
           );
         } else if (snapshot.hasError) {
           // Handle errors if necessary
+          if (snapshot.error.toString() == "Exception: Invalid token") {
+            return Center(
+              child: Text('Error: ${snapshot.error}, please login again'),
+            );
+          }
+
           return Center(
             child: Text('Error: ${snapshot.error}'),
           );
