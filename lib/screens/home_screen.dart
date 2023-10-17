@@ -1,11 +1,13 @@
 import 'package:client_app/screens/login_screen.dart';
 import 'package:client_app/widgets/about_us.dart';
-import 'package:client_app/widgets/deposit_retire.dart';
+import 'package:client_app/widgets/deposit_retire/deposit_retire.dart';
 import 'package:client_app/widgets/discover/discover.dart';
 import 'package:client_app/widgets/home/home.dart';
 import 'package:client_app/widgets/watchlist.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
+import '../widgets/custom/custom_logo_padding.dart';
 
 class HomeScreen extends StatelessWidget {
   final Widget body;
@@ -21,20 +23,22 @@ class HomeScreen extends StatelessWidget {
       screen = const HomeScreen(
           body: DepositRetireWidget(), title: 'Deposit / Retire');
     } else if (option == 'Portfolio') {
-      screen = const HomeScreen(body: AboutUsWidget(), title: 'Portfolio');
+      screen = const HomeScreen(body: WatchlistWidget(), title: 'Portfolio');
     } else if (option == 'Discover') {
       screen = const DiscoverWidget();
     } else if (option == 'AboutUs') {
       screen = const HomeScreen(body: AboutUsWidget(), title: 'About Us');
     } else if (option == 'Profile') {
-      screen = const HomeScreen(body: AboutUsWidget(), title: 'Profile');
+      screen = const HomeScreen(body: WatchlistWidget(), title: 'Profile');
     } else {
       screen = const HomeWidget();
     }
 
     if (option == 'Logout') {
       const storage = FlutterSecureStorage();
-      storage.delete(key: "JWT").then((value) {
+      storage.delete(key: "JWT").then((_) {
+        storage.delete(key: "ID");
+      }).then((value) {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
             builder: (context) => const LoginScreen(),
@@ -67,7 +71,7 @@ class HomeScreen extends StatelessWidget {
               _navigateToScreens(context, 'Home');
             },
             child: Padding(
-              padding: const EdgeInsets.only(top: 50.0), // Adjust the padding value as needed
+              padding: getCustomPadding(), // Adjust the padding value as needed
               child: Image.asset(
                 'assets/logo.png',
                 height: 80,

@@ -1,8 +1,10 @@
+import 'package:client_app/services/graphql_service.dart';
 import 'package:client_app/widgets/home/home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../services/authentication_service.dart';
+import '../widgets/custom/custom_logo_padding.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -17,8 +19,7 @@ class LoginScreen extends StatelessWidget {
         title: const Text('Login'),
         flexibleSpace: Center(
           child: Padding(
-            padding: const EdgeInsets.only(top: 50.0),
-            // Adjust the padding value as needed
+            padding: getCustomPadding(), // Adjust the padding value as needed
             child: Image.asset(
               'assets/logo.png',
               height: 80,
@@ -63,7 +64,13 @@ class LoginScreen extends StatelessWidget {
                     // Authentication successful
                     const storage = FlutterSecureStorage();
                     print('Token: $token');
-                    storage.write(key: "JWT", value: token).then((value) {
+                    storage.write(key: "JWT", value: token).then((_) {
+                      // The JWT has been written, now write the ID
+                      GraphQLService().getID().then((id) {
+                        print('ID: $id');
+                        return storage.write(key: "ID", value: id);
+                      });
+                    }).then((_) {
                       Navigator.of(context).pushReplacement(
                         MaterialPageRoute(
                           builder: (context) => const HomeWidget(),

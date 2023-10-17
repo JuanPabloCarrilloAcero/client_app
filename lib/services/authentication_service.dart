@@ -45,9 +45,7 @@ class AuthenticationService {
     }
   }
 
-  //TODO: Connect with graphql
   Future<bool> verify() async {
-    await Future.delayed(const Duration(seconds: 0)); // Adding a 5-second delay
 
     const storage = FlutterSecureStorage();
     String? jwtToken = await storage.read(key: 'JWT');

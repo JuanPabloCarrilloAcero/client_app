@@ -7,6 +7,6 @@ class DashboardBalanceWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    return const DataCardWidget(title: "Balance", data: ["data"]);
+    return const DataCardWidget(title: "Balance", data: ["We are working on this feature!"]);
   }
 }

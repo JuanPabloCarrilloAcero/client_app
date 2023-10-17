@@ -7,7 +7,7 @@ class WatchlistWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return const CupertinoPageScaffold(
       child: Center(
-        child: Text('Watchlist'),
+        child: Text('We are working on this feature!'),
       ),
     );
   }
