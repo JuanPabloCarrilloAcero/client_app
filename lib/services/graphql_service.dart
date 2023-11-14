@@ -4,6 +4,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 
+import '../methods/extractMessage.dart';
 import '../models/dashboard_model.dart';
 
 class GraphQLService {
@@ -56,6 +57,8 @@ class GraphQLService {
     var data = DashboardModel(
       predictions: [],
       news: [],
+      balance: 0,
+      owned: [],
     );
 
     const String relevantQuery = r'''
@@ -118,7 +121,118 @@ class GraphQLService {
       data.news = news;
     }
 
+    const String balanceQuery = r'''
+      query {
+        balanceByUserId ( userId: $userId ) {
+          valor
+        }
+      }
+    ''';
+
+    const storage = FlutterSecureStorage();
+    String? userId = await storage.read(key: 'ID');
+
+    final Map<String, dynamic> variables = {
+      'userId': userId,
+    };
+
+    final mutatedBalanceQuery = balanceQuery
+        .replaceAll('\$userId', '${variables['userId']}');
+
+    final balanceResult = await performQuery(mutatedBalanceQuery);
+
+    if ( balanceResult.hasException ) {
+      if ( balanceResult.exception is OperationException &&
+          balanceResult.exception!.graphqlErrors.isNotEmpty ) {
+        final graphqlErrorMessage =
+        balanceResult.exception?.graphqlErrors[0].message;
+
+        throw Exception(graphqlErrorMessage);
+      }
+      throw balanceResult.exception!;
+    } else {
+      final balanceData = balanceResult.data?['balanceByUserId'];
+      data.balance = balanceData['valor'];
+    }
+
+    const String ownedQuery = r'''
+      query {
+        getOwnedStocks ( userId: $userId ) {
+          cantidad,
+          id_empresa
+        }
+      }
+    ''';
+
+    final mutatedOwnedQuery = ownedQuery
+        .replaceAll('\$userId', '${variables['userId']}');
+
+    final ownedResult = await performQuery(mutatedOwnedQuery);
+
+    if ( ownedResult.hasException ) {
+      if ( ownedResult.exception is OperationException &&
+          ownedResult.exception!.graphqlErrors.isNotEmpty ) {
+        final graphqlErrorMessage =
+        ownedResult.exception?.graphqlErrors[0].message;
+
+        throw Exception(graphqlErrorMessage);
+      }
+      throw ownedResult.exception!;
+    } else {
+      List<dynamic> ownedData = ownedResult.data?['getOwnedStocks'];
+      List<dynamic> empresas = await fetchEmpresas();
+
+      List<Map<String, dynamic>?> updatedOwnedStocks = ownedData.map((ownedStock) {
+        if (ownedStock == null) return null;
+        if (ownedStock is Map<String, dynamic>) {
+          final idEmpresa = ownedStock["id_empresa"];
+          final matchingEmpresa = empresas.firstWhere(
+                (empresa) => empresa is Map<String, dynamic> && empresa["_id"] == idEmpresa,
+            orElse: () => null,
+          );
+
+          if (matchingEmpresa != null) {
+            ownedStock["ticker"] = matchingEmpresa["ticker"];
+          }
+        }
+        return ownedStock as Map<String, dynamic>?;
+      }).toList();
+
+      data.owned = updatedOwnedStocks.
+          map((json) => Owned.fromJson(json!))
+          .cast<Owned>()
+          .toList();
+    }
+
+
     return data;
+  }
+
+  Future<List<dynamic>> fetchEmpresas() async {
+    const String companyQuery = r'''
+      query {
+        getEmpresas {
+          _id,
+          ticker,
+        }
+      }
+    ''';
+
+    final companyResult = await performQuery(companyQuery);
+
+    if (companyResult.hasException) {
+      if (companyResult.exception is OperationException &&
+          companyResult.exception!.graphqlErrors.isNotEmpty) {
+        final graphqlErrorMessage =
+            companyResult.exception?.graphqlErrors[0].message;
+
+        throw Exception(graphqlErrorMessage);
+      }
+      throw companyResult.exception!;
+    } else {
+      final companyData = companyResult.data?['getEmpresas'];
+      return companyData;
+    }
   }
 
   Future<DiscoverModel> fetchDataDiscover() async {
@@ -329,12 +443,73 @@ class GraphQLService {
           mutationResult.exception!.graphqlErrors.isNotEmpty) {
         final graphqlErrorMessage =
         mutationResult.exception?.graphqlErrors[0].message;
+        RegExp pattern = RegExp(r'^\d+ - \{.*\}$');
+
+        if (pattern.hasMatch(graphqlErrorMessage!)) {
+          String message = extractMessage(graphqlErrorMessage);
+          throw Exception(message);
+        } else {
+          throw Exception(graphqlErrorMessage);
+        }
+      }
+      throw mutationResult.exception!;
+    } else {
+      return mutationResult.data?['createTransaccion']['id'].toString();
+    }
+
+  }
+
+  Future<String?> createUser ( String nameUser, String passwordUser, String roleUser) async {
+
+    if (nameUser.isEmpty) {
+      throw Exception('Username must be defined');
+    }
+
+    if (passwordUser.isEmpty) {
+      throw Exception('Password must be defined');
+    }
+
+    if (roleUser.isEmpty) {
+      throw Exception('Role must be defined');
+    }
+
+    const String createMutation = r'''
+      mutation {
+        createUsuario ( usuario: {
+          activeUser: true,
+          nameUser: $nameUser,
+          passwordUser: $passwordUser,
+          roleUser: $roleUser
+          }) {
+            idUser
+        }
+      }
+    ''';
+
+    final Map<String, dynamic> variables = {
+      'nameUser': nameUser,
+      'passwordUser': passwordUser,
+      'roleUser': roleUser,
+    };
+
+    final mutatedCreateMutation = createMutation
+        .replaceAll('\$nameUser', '"${variables['nameUser']}"')
+        .replaceAll('\$passwordUser', '"${variables['passwordUser']}"')
+        .replaceAll('\$roleUser', '"${variables['roleUser']}"');
+
+    final mutationResult = await GraphQLService().performMutation(mutatedCreateMutation);
+
+    if (mutationResult.hasException) {
+      if (mutationResult.exception is OperationException &&
+          mutationResult.exception!.graphqlErrors.isNotEmpty) {
+        final graphqlErrorMessage =
+        mutationResult.exception?.graphqlErrors[0].message;
 
         throw Exception(graphqlErrorMessage);
       }
       throw mutationResult.exception!;
     } else {
-      return mutationResult.data?['createTransaccion']['id'].toString();
+      return mutationResult.data?['createUsuario']['idUser'].toString();
     }
 
   }

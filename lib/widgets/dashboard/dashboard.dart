@@ -15,8 +15,12 @@ class DashboardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DataGridviewWidget(body: <Widget>[
-      const DashboardBalanceWidget(),
-      const DashboardOwnedStocks(),
+      DashboardBalanceWidget(
+        amount: data.balance,
+      ),
+      DashboardOwnedStocks(
+        stocks: data.owned,
+      ),
       DashboardPredictionsWidget(
         predictions: data.predictions,
       ),

@@ -53,6 +53,23 @@ class LoginScreen extends StatelessWidget {
                   ),
                 ),
               ),
+              const SizedBox(height: 16),
+              GestureDetector(
+                onTap: () {
+                  _showModal(context);
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  child: const Text(
+                    'Register',
+                    style: TextStyle(
+                      color: Colors.blue,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () {
                   final username = usernameController.text;
@@ -95,6 +112,108 @@ class LoginScreen extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  void _showModal(BuildContext context) {
+    String nameUser = '';
+    String passwordUser = '';
+    String roleUser = '';
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Registration',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              )),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                onChanged: (value) {
+                  nameUser = value;
+                },
+                decoration: const InputDecoration(labelText: 'Name'),
+              ),
+              TextField(
+                onChanged: (value) {
+                  passwordUser = value;
+                },
+                obscureText: true,
+                decoration: const InputDecoration(labelText: 'Password'),
+              ),
+              TextField(
+                onChanged: (value) {
+                  roleUser = value;
+                },
+                decoration: const InputDecoration(labelText: 'Role'),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                // Add code to handle the "Close" button action here
+                Navigator.of(context).pop();
+              },
+              child: const Text('Close'),
+            ),
+            TextButton(
+              onPressed: () {
+                print("create");
+                GraphQLService()
+                    .createUser(nameUser, passwordUser, roleUser)
+                    .then((r) => ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Row(
+                      children: [
+                        const Icon(
+                          Icons.check,
+                          color: Colors
+                              .white, // Change the checkmark color to blue
+                        ),
+                        const SizedBox(width: 10),
+                        // Some spacing
+                        Text(
+                          'The creation was successful with ID: $r',
+                          style: const TextStyle(
+                              color: Colors
+                                  .white), // Change text color to white
+                        ),
+                      ],
+                    ),
+                    backgroundColor: Colors
+                        .green, // Change the background color to green
+                  ),
+                ))
+                    .catchError((error) =>
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Row(
+                        children: [
+                          const Icon(Icons.error, color: Colors.red),
+                          // Error icon
+                          const SizedBox(width: 10),
+                          // Some spacing
+                          Text(
+                              'An error occurred while saving the user: $error'),
+                        ],
+                      ), // Set the background color to red for error messages
+                    )));
+              },
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all(Colors.blue),
+                // Change background color
+                foregroundColor: MaterialStateProperty.all(
+                    Colors.white), // Change text color
+              ),
+              child: const Text('Submit'),
+            ),
+          ],
+        );
+      },
     );
   }
 }

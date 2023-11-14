@@ -1,8 +1,10 @@
 class DashboardModel {
   late List<Prediction> predictions;
   late List<News> news;
+  late double balance;
+  late List<Owned> owned;
 
-  DashboardModel({required this.predictions, required this.news});
+  DashboardModel({required this.predictions, required this.news, required this.balance, required this.owned});
 }
 
 class Prediction {
@@ -46,5 +48,27 @@ class News {
   @override
   String toString() {
     return 'News{titulo: $titulo, url: $url}';
+  }
+}
+
+class Owned {
+  final String ticker;
+  final double value;
+
+  Owned({
+    required this.ticker,
+    required this.value,
+  });
+
+  factory Owned.fromJson(Map<String, dynamic> json) {
+    return Owned(
+      ticker: json['ticker'],
+      value: (json['cantidad'] as num).toDouble(),
+    );
+  }
+
+  @override
+  String toString() {
+    return 'Owned{ticker: $ticker, value: $value}';
   }
 }
